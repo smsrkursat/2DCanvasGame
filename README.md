@@ -21,3 +21,4 @@
  - Her yakalanan nesne için skor artar.
  - Bir nesne bileşene ulaştığında, oyun biter ve skor ekranda gösterilir.
 
+
