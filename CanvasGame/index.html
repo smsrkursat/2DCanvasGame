@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Canvasın çerçevi ve ekranın ortasına sabitlenmesi */
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ekleyeceğim resimlere ulaşmak için bu yöntemi kullandım -->
+    <img id="componentImage" src="holee.jpg" style="display:none;">
+    <img id="backgroundImage" src="last.jpg" style="display:none;">
+    <img id="objectImage" src="astronot2.png" style="display:none;">
+
+    <canvas id="gameCanvas" width="1200" height="800"></canvas>
+
+
+
+    <script>
+        //Oyun başlangıc yazısı
+        alert("Sonsuz uzayda sürüklenen astronotları evlerine ışınla");
+
+        // Canvasa ulaşmak ve context kurmak.
+        var canvas = document.getElementById("gameCanvas");
+        var ctx = canvas.getContext("2d");
+
+        //Kontrol edilecek olan componentin özellikleri
+        var component = { x: canvas.width / 2 - 15, y: canvas.height * (9 / 10) - 15, width: 150, height: 84, };
+
+        //Eklenecek resimlere ulaşım
+        var componentImage = document.getElementById("componentImage");
+        var backgroundImage = document.getElementById("backgroundImage");
+        var objectImage = document.getElementById("objectImage");
+
+        // Skor tutmak için bir değişken
+        var score = 0;
+
+        // Düşen astronotlar
+        var objects = [];
+
+        // Oyun döngüsü
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Arkaplanın çizimi
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+            // Componentin çizimi
+            ctx.fillStyle = "blue";
+            ctx.fillRect(component.x, component.y, component.width, component.height);
+            ctx.drawImage(componentImage, component.x, component.y, component.width, component.height);
+
+
+            // Skoru yazdırma.
+            ctx.font = "40px Arial";
+            ctx.fillStyle = "green";
+            ctx.fillText("Score: " + score, canvas.width - 170, 40);
+
+            // Objeleri çizme
+            for (var i = 0; i < objects.length; i++) {
+                var obj = objects[i];
+
+                //Tek bir obje çizimi
+                ctx.fillStyle = "red";
+                ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                ctx.drawImage(objectImage, obj.x, obj.y, obj.width, obj.height);
+
+                // Objeyi aşağı hareket ettirmek.
+                obj.y += 1.2;
+
+                // Objelerle çarpışmayı kontrol etmek.
+                if (obj.y + obj.height >= component.y && obj.x >= component.x && obj.x + obj.width <= component.x + component.width) {
+                    // Kullanıcı astorntu yakaladı.score değeri bir arttı.
+                    score++;
+                    objects.splice(i, 1); // Tutan objeyi kaldır
+                }
+
+                // Kullanıcının tutamadığı durum.
+                if (obj.y + obj.height >= canvas.height) {
+                    //Oyunu sonlandırmak.
+                    gameOver();
+                    return;
+                }
+            }
+
+            // Yeni bir obje oluşturmak ve özelliklerini atamak.
+            if (Math.random() < 0.01) {
+                var objX = Math.random() * (canvas.width - 30);
+                var objY = 0;
+                var objWidth = 30;
+                var objHeight = 30;
+                var newObj = { x: objX, y: objY, width: objWidth, height: objHeight };
+                objects.push(newObj);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Oyunu başlat
+        gameLoop();
+
+        // Oyun bitince score ekrana yazar ve oyun yeniden başlar.
+        function gameOver() {
+            alert("Oyun Bitti! Skor: " + score);
+            location.reload(); // Sayfa yeniden yüklenir.
+        }
+
+        //Mouse ile componenti kontrol etmek.
+        canvas.addEventListener("mousemove", function (event) {
+            var rect = canvas.getBoundingClientRect();
+            component.x = event.clientX - rect.left - (component.width / 2);
+        });
+
+    </script>
+</body>
+
+</html>
